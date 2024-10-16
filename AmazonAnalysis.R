@@ -2,31 +2,36 @@ library(tidyverse)
 library(tidymodels)
 library(embed)
 library(vroom)
-library(skimr)
-library(DataExplorer)
-library(ggmosaic)
-library(ggplot2)
+# library(skimr)
+# library(DataExplorer)
+# library(ggmosaic)
+# library(ggplot2)
 library(lme4)
+library(doParallel)
+
+num_cores <- detectCores()
+cl <- makePSOCKcluster(num_cores)
+registerDoParallel(cl)
 
 # Read in data
-train_data <- vroom("C:/Users/nsnie/OneDrive/BYU Classes/Fall 2024/STAT 348/AmazonEmployeeAccess/train.csv")
-test_data <- vroom("C:/Users/nsnie/OneDrive/BYU Classes/Fall 2024/STAT 348/AmazonEmployeeAccess/test.csv")
-sample_sub <- vroom("C:/Users/nsnie/OneDrive/BYU Classes/Fall 2024/STAT 348/AmazonEmployeeAccess/sampleSubmission.csv")
+train_data <- vroom("./train.csv")
+test_data <- vroom("./test.csv")
+sample_sub <- vroom("./sampleSubmission.csv")
 
-glimpse(train_data)
-skim(train_data)
-plot_bar(train_data)
-plot_correlation(train_data)
-
-# Boxplot of ROLE_TITLE
-title_plot <- ggplot(data = train_data) +
-  geom_boxplot(aes(x = ACTION, y = ROLE_TITLE))
-title_plot
-
-# Boxplot of ROLE_FAMILY
-fam_plot <- ggplot(data = train_data) +
-  geom_boxplot(aes(x = ACTION, y = ROLE_FAMILY))
-fam_plot
+# glimpse(train_data)
+# skim(train_data)
+# plot_bar(train_data)
+# plot_correlation(train_data)
+# 
+# # Boxplot of ROLE_TITLE
+# title_plot <- ggplot(data = train_data) +
+#   geom_boxplot(aes(x = ACTION, y = ROLE_TITLE))
+# title_plot
+# 
+# # Boxplot of ROLE_FAMILY
+# fam_plot <- ggplot(data = train_data) +
+#   geom_boxplot(aes(x = ACTION, y = ROLE_FAMILY))
+# fam_plot
 
 # Make ACTION a factor
 train_data$ACTION <- as.factor(train_data$ACTION)
@@ -40,8 +45,6 @@ amazon_recipe <- recipe(ACTION ~ ., data = train_data) %>%
   step_rm(ROLE_CODE)
 prepped_amazon_recipe <- prep(amazon_recipe)
 bake(prepped_amazon_recipe, new_data = train_data)
-
-view(baked_recipe)
 
 ## Logistic Regression
 # Logistic regression model
@@ -70,7 +73,7 @@ kaggle_submission <- log_amazon_preds %>%
 
 # Write the submission to a csv file
 vroom_write(x = kaggle_submission,
-            file = "C:/Users/nsnie/OneDrive/BYU Classes/Fall 2024/STAT 348/AmazonEmployeeAccess/log_reg_preds.csv", 
+            file = "./log_reg_preds.csv", 
             delim = ",")
 
 
@@ -128,5 +131,10 @@ kaggle_submission <- plog_reg_preds %>%
 
 # Write the submission to a csv file
 vroom_write(x = kaggle_submission,
-            file = "C:/Users/nsnie/OneDrive/BYU Classes/Fall 2024/STAT 348/AmazonEmployeeAccess/plog_reg_preds.csv", 
+            file = "./plog_reg_preds.csv", 
             delim = ",")
+
+stopCluster(cl)
+
+# Use relative file locations like ./STAT 348/AmazonEmployeeAccess
+
