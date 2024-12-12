@@ -1,8 +1,8 @@
 library(tidymodels)
 library(tidyverse)
 library(vroom)
-library(kknn)
 library(embed)
+library(knn)
 
 # Read in data
 train_data <- vroom("./train.csv")
