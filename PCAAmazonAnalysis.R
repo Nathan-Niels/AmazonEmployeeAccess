@@ -272,7 +272,7 @@ kaggle_submission <- rf_preds %>%
 
 # Write the submission to a csv file
 vroom_write(x = kaggle_submission,
-            file = "./rf_preds.csv", 
+            file = "./pca_rf_preds.csv", 
             delim = ",")
 
 stopCluster(cl)
