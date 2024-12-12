@@ -20,10 +20,10 @@ amazon_recipe <- recipe(ACTION ~ ., data = train_data) %>%
 prepped_amazon_recipe <- prep(amazon_recipe)
 bake(prepped_amazon_recipe, new_data = train_data)
 
-# KNN Model
+# RF Model
 rf_model <- rand_forest(mtry = tune(),
                         min_n = tune(),
-                        trees = 500) %>% 
+                        trees = 99) %>% 
   set_mode("classification") %>% 
   set_engine("ranger")
 
